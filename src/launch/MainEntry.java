@@ -10,18 +10,17 @@ public class MainEntry {
 
 	public static void main(String[] args) {
 		
-		Data data = new Data("AlarmClock");
+		Data data = new Data("Baby");
 //		data.writeDataToFile("dataTest.txt");
+		ArrayList<Data> listData = data.splitData(3);
 		
 		
-		NaiveBayesClassifier nb = new NaiveBayesClassifier(data, 0.5);
+		NaiveBayesClassifier nb = new NaiveBayesClassifier(listData.get(0), 0.5);
 		
 		nb.classifier();
 		
 		System.out.println(nb.numberPercentFalse());
-		
-		String s = "jfkj wef hwe we hoiwefhwie w iefweifwef hw hfwief heh";
-		
+				
 //		String[] arr = s.split(" ");
 //		
 //		for( String s : arr){

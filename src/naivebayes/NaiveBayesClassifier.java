@@ -15,7 +15,7 @@ public class NaiveBayesClassifier {
 		this.lamda = lamda;
 	}
 	
-	public void classifier(){
+	public void classifier(Data dataSets){
 		Vocabulary voca = new Vocabulary(dataSets);
 		voca.computeProbabilityVoca(lamda);
 		double probabiPos;

@@ -16,32 +16,46 @@ public class Data {
 	public Data(String namedomain) {
 		this.nameDomain = namedomain;
 		namedomain = "ACL2015-Chen-Datasets/" + namedomain + ".txt";
+		data = readDataFromFile(namedomain);
+
+		// tinh so label va xac suat
+		computeNumberLabel();
+		computeProbabiLabels();
+
+	}
+
+	public Data(ArrayList<Document> listDocument) {
+
+		data = listDocument;
+		// tinh so label va xac suat
+		computeNumberLabel();
+		computeProbabiLabels();
+
+	}
+
+	public ArrayList<Document> readDataFromFile(String nameFile) {
 		String line = null;
-		data = new ArrayList<Document>();
+		ArrayList<Document> dataSet = new ArrayList<Document>();
 		try {
-			FileReader fileReader = new FileReader(namedomain);
+			FileReader fileReader = new FileReader(nameFile);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			Document document = null;
 
 			while ((line = bufferedReader.readLine()) != null) {
 				if (!line.contains("Domain") && !line.contains("NEU")) {
 					document = this.splitLineData(line);
-					data.add(document);
+					dataSet.add(document);
 				}
 			}
-
-			// tinh so label va xac suat
-			computeNumberLabel();
-			computeProbabiLabels();
 
 			setNullToLabelGuess();
 			fileReader.close();
 		} catch (FileNotFoundException ex) {
-			System.out.println("Unable to open file '" + namedomain);
+			System.out.println("Unable to open file '" + nameFile);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-
+		return dataSet;
 	}
 
 	private void setNullToLabelGuess() {
@@ -77,9 +91,10 @@ public class Data {
 
 		return listDocument;
 	}
-	public ArrayList<String> getReviewsByLabel(String label){
+
+	public ArrayList<String> getReviewsByLabel(String label) {
 		ArrayList<String> listReview = new ArrayList<String>();
-		for(Document d : data){
+		for (Document d : data) {
 			listReview.add(d.getReview());
 		}
 		return listReview;
@@ -138,14 +153,14 @@ public class Data {
 			e.printStackTrace();
 		}
 	}
-	
-	public ArrayList<String> splitDataSetToWordByLabel(String label){
+
+	public ArrayList<String> splitDataSetToWordByLabel(String label) {
 		ArrayList<String> listWord = new ArrayList<String>();
 		ArrayList<Document> listDocument = this.getDocumentsByLabel(label);
-		ArrayList<String> words ;
-		
-		for(Document d : listDocument){
-			if(d.getLabel().equals(label)){
+		ArrayList<String> words;
+
+		for (Document d : listDocument) {
+			if (d.getLabel().equals(label)) {
 				words = Util.Utility.splitReviewtoWords(d.getReview());
 				for (String w : words)
 					listWord.add(w);
@@ -153,25 +168,45 @@ public class Data {
 		}
 		return listWord;
 	}
-	
-	public ArrayList<String> listWordInDataSet(){
+
+	public ArrayList<String> listWordInDataSet() {
 		ArrayList<String> listWords = new ArrayList<String>();
-		
+
 		listWords.addAll(splitDataSetToWordByLabel("POS"));
 		listWords.addAll(splitDataSetToWordByLabel("NEG"));
-		
+
 		return listWords;
 	}
-	public ArrayList<Document> getDocuments(){
+
+	public ArrayList<Document> getDocuments() {
 		return data;
 	}
-	
-	public double getProLabel(String label){
-		for(Label l : labels){
-			if(l.getLabel().equals(label))
+
+	public double getProLabel(String label) {
+		for (Label l : labels) {
+			if (l.getLabel().equals(label))
 				return l.getProbability();
 		}
 		return 0;
+	}
+
+	public ArrayList<Data> splitData(int n) {
+		ArrayList<Data> listData = new ArrayList<Data>();
+		int nextIndex = 0;
+		int newIndex = data.size() / n;
+		ArrayList<Document> documents;
+		Data d;
+		for (int i = 1; i < n; i++) {
+			documents = (ArrayList<Document>) data.subList(nextIndex, i * newIndex);
+			nextIndex = i * newIndex;
+			d = new Data(documents);
+			d.nameDomain = nameDomain;
+			
+			listData.add(d);
+
+		}
+
+		return listData;
 	}
 
 }
